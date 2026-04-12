@@ -531,6 +531,8 @@ def check_spy_stop_loss(state: dict, strategy: str) -> list:
     if not spy_price or not spy_open:
         return []
     chg = (spy_price - spy_open) / spy_open * 100
+    # chg > -SPY_STOP_PCT means SPY has NOT fallen enough to trigger the stop
+    # e.g. SPY_STOP_PCT=1.5: only fire when chg <= -1.5% (SPY down 1.5%+)
     if chg > -cfg.SPY_STOP_PCT:
         return []
     return [{"sym": sym, "shares": h["shares"],
