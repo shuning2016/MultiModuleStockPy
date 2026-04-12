@@ -62,7 +62,7 @@ def api_get_watchlist():
 
 @app.route("/api/watchlist", methods=["POST"])
 def api_save_watchlist():
-    body = request.get_json(force=True) or {}
+    body = request.get_json(force=True, silent=True) or {}
     return ok(save_watchlist(body.get("stocks", [])))
 
 
@@ -75,7 +75,7 @@ def api_quote(symbol):
 
 @app.route("/api/news", methods=["POST"])
 def api_news():
-    body = request.get_json(force=True) or {}
+    body = request.get_json(force=True, silent=True) or {}
     return ok(get_news_for_items(body.get("items", []), body.get("limit", 5)))
 
 
@@ -83,7 +83,7 @@ def api_news():
 
 @app.route("/api/analyze", methods=["POST"])
 def api_analyze():
-    body = request.get_json(force=True) or {}
+    body = request.get_json(force=True, silent=True) or {}
     prompt   = body.get("prompt", "")
     provider = body.get("provider", "grok")
     if not prompt:
@@ -104,7 +104,7 @@ def api_reset_state(provider):
 @app.route("/api/state/<provider>/save", methods=["POST"])
 def api_save_state(provider):
     """Allow frontend to push a local state back to server."""
-    body = request.get_json(force=True) or {}
+    body = request.get_json(force=True, silent=True) or {}
     state = body.get("state")
     if not state:
         return err("state required")
@@ -116,7 +116,7 @@ def api_save_state(provider):
 
 @app.route("/api/session/run", methods=["POST"])
 def api_run_session():
-    body     = request.get_json(force=True) or {}
+    body     = request.get_json(force=True, silent=True) or {}
     session  = body.get("session")
     provider = body.get("provider", "grok")
     strategy = body.get("strategy", "v5")
@@ -182,7 +182,7 @@ def api_time():
 
 @app.route("/api/context", methods=["POST"])
 def api_context():
-    body = request.get_json(force=True) or {}
+    body = request.get_json(force=True, silent=True) or {}
     provider = body.get("provider", "grok")
     state = load_state(provider)
     portfolio = build_portfolio_summary(state)
