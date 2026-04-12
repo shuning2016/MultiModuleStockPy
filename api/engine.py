@@ -641,7 +641,7 @@ def execute_decisions(state, ai_text, label, strategy):
     today = get_today_et()
     now_time = get_now_et()
 
-    run_auto_stops(state, label, strategy, executed, today, now_time, label)
+    run_auto_stops(state, session, strategy, executed, today, now_time, label)
 
     pending = parse_ai_decisions(ai_text)
     pending.sort(key=lambda d: (0 if d["action"] == "SELL" else 1, -d.get("confidence", 6)))
