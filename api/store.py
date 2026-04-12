@@ -2,11 +2,11 @@
 Persistence layer — abstracted store with three backends:
 
   1. File store  (default / local dev)  → ./data/*.json
-  2. Vercel KV   (production)           → set KV_REST_API_URL + KV_REST_API_TOKEN env vars
+  2. Vercel KV   (production)           → set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN env vars
   3. Memory      (fallback / testing)   → pure in-process dict
 
 Backend is selected automatically:
-  - KV_REST_API_URL set  → Vercel KV
+  - UPSTASH_REDIS_REST_URL set  → Upstash Redis (Vercel KV)
   - otherwise            → File store (creates ./data/ dir)
   - DATA_DIR=":memory:"  → Memory (useful for tests)
 
@@ -26,8 +26,8 @@ from pathlib import Path
 from typing import Any, Optional
 
 # ── Choose backend ────────────────────────────────────────────────────────────
-_KV_URL   = os.environ.get("KV_REST_API_URL", "")
-_KV_TOKEN = os.environ.get("KV_REST_API_TOKEN", "")
+_KV_URL   = os.environ.get("UPSTASH_REDIS_REST_URL", "")
+_KV_TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN", "")
 _DATA_DIR = os.environ.get("DATA_DIR", "")
 
 if _DATA_DIR == ":memory:":

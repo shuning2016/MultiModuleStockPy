@@ -25,5 +25,31 @@
   ],
   "env": {
     "PYTHONPATH": "."
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/premarket",
+      "schedule": "15 13 * * 1-5"
+    },
+    {
+      "path": "/api/cron/gapgo",
+      "schedule": "35 13 * * 1-5"
+    },
+    {
+      "path": "/api/cron/opening",
+      "schedule": "15 14 * * 1-5"
+    },
+    {
+      "path": "/api/cron/mid",
+      "schedule": "30 15 * * 1-5"
+    },
+    {
+      "path": "/api/cron/afternoon",
+      "schedule": "0 18 * * 1-5"
+    },
+    {
+      "path": "/api/cron/closing",
+      "schedule": "45 19 * * 1-5"
+    }
+  ]
 }

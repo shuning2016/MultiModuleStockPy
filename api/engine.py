@@ -26,11 +26,11 @@ from strategies import (
 from api.store import store_get, store_set, store_del, store_keys, backend_info
 
 # ── API keys ──────────────────────────────────────────────────────────────────
-FINNHUB_KEY  = os.environ.get("FINNHUB_KEY",  "")
-NEWSAPI_KEY  = os.environ.get("NEWSAPI_KEY",  "")
-CLAUDE_KEY   = os.environ.get("CLAUDE_KEY",   "")
-GROK_KEY     = os.environ.get("GROK_KEY",     "")
-DEEPSEEK_KEY = os.environ.get("DEEPSEEK_KEY", "")
+FINNHUB_KEY      = os.environ.get("FINNHUB_KEY",      "")
+NEWSAPI_KEY      = os.environ.get("NEWSAPI_KEY",      "")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+GROK_KEY         = os.environ.get("GROK_KEY",         "")
+DEEPSEEK_KEY     = os.environ.get("DEEPSEEK_KEY",     "")
 
 INITIAL_CASH = 10_000.0
 MAX_TRADES_PER_DAY = 5
@@ -379,12 +379,12 @@ def parse_analysis_confidence(text: str) -> dict:
 # ─────────────────────────────────────────────────────────────────
 
 def call_claude(prompt: str) -> dict:
-    if not CLAUDE_KEY:
-        return {"error": "CLAUDE_KEY not set"}
+    if not ANTHROPIC_API_KEY:
+        return {"error": "ANTHROPIC_API_KEY not set"}
     try:
         r = requests.post(
             "https://api.anthropic.com/v1/messages",
-            headers={"x-api-key": CLAUDE_KEY,
+            headers={"x-api-key": ANTHROPIC_API_KEY,
                      "anthropic-version": "2023-06-01",
                      "content-type": "application/json"},
             json={"model": "claude-sonnet-4-20250514", "max_tokens": 2000,

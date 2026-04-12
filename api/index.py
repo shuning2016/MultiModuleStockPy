@@ -195,6 +195,52 @@ def health():
                "store": backend_info()})
 
 
+# ─── Vercel Cron triggers ────────────────────────────────────────────────────
+#
+# Cron schedule (all times ET, weekdays only):
+#   premarket  9:15  →  13:15 UTC (EDT) / 14:15 UTC (EST)
+#   gapgo      9:35  →  13:35 UTC (EDT) / 14:35 UTC (EST)
+#   opening   10:15  →  14:15 UTC (EDT) / 15:15 UTC (EST)
+#   mid       11:30  →  15:30 UTC (EDT) / 16:30 UTC (EST)
+#   afternoon 14:00  →  18:00 UTC (EDT) / 19:00 UTC (EST)
+#   closing   15:45  →  19:45 UTC (EDT) / 20:45 UTC (EST)
+#
+# Vercel sends:  Authorization: Bearer <CRON_SECRET>
+# Sessions run with default provider "grok" for automated execution.
+
+_V4_SESSION_KEYS = {s["key"] for s in StrategyV4.SESSIONS}
+_V5_SESSION_KEYS = {s["key"] for s in StrategyV5.SESSIONS}
+
+
+def _cron_authorized() -> bool:
+    secret = os.environ.get("CRON_SECRET", "")
+    if not secret:
+        return False
+    return request.headers.get("Authorization", "") == f"Bearer {secret}"
+
+
+@app.route("/api/cron/<session_key>", methods=["GET"])
+def api_cron(session_key):
+    if not _cron_authorized():
+        return err("Unauthorized", 401)
+
+    if not is_trading_day():
+        return ok({"skipped": "not a trading day"})
+
+    provider = request.args.get("provider", "grok")
+    results = {}
+
+    if session_key in _V4_SESSION_KEYS:
+        results["v4"] = run_trade_session(session_key, provider, "v4")
+    if session_key in _V5_SESSION_KEYS:
+        results["v5"] = run_trade_session(session_key, provider, "v5")
+
+    if not results:
+        return err(f"unknown session: {session_key}", 400)
+
+    return ok(results)
+
+
 # ─── Vercel entry ────────────────────────────────────────────────────────────
 
 # Vercel looks for a module-level `app` (WSGI callable) — done above.
