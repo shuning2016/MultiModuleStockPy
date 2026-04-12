@@ -196,7 +196,8 @@ def check_auto_stop_rules_v5(state: dict, session: str) -> list[dict]:
 
     for sym, h in list(state.get("holdings", {}).items()):
         price = last_prices.get(sym, h["avgCost"])
-        pct = (price - h["avgCost"]) / h["avgCost"] * 100
+        avg_cost = h["avgCost"]
+        pct = (price - avg_cost) / avg_cost * 100 if avg_cost else 0.0
         is_trend = h.get("isTrendTrade", False)
 
         # Hard stop -1.5% (all trade types)

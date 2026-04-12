@@ -297,7 +297,8 @@ def build_portfolio_summary(state: dict) -> str:
     for sym, h in holdings.items():
         price = last_prices.get(sym, h["avgCost"])
         val = price * h["shares"]
-        pct = (price - h["avgCost"]) / h["avgCost"] * 100
+        avg_cost = h["avgCost"]
+        pct = (price - avg_cost) / avg_cost * 100 if avg_cost else 0.0
         total_hold += val
         parts.append(f"{sym} {h['shares']}sh@{h['avgCost']:.0f}→{price:.0f}"
                      f"({'+'if pct>=0 else ''}{pct:.1f}%)")
