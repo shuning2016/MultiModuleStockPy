@@ -390,7 +390,7 @@ def call_claude(prompt: str) -> dict:
                      "content-type": "application/json"},
             json={"model": "claude-sonnet-4-20250514", "max_tokens": 2000,
                   "messages": [{"role": "user", "content": prompt}]},
-            timeout=90,
+            timeout=55,
         )
         data = r.json()
         if data.get("content"):
@@ -410,7 +410,7 @@ def call_grok(prompt: str) -> dict:
                      "content-type": "application/json"},
             json={"model": "grok-3", "max_tokens": 2000,
                   "messages": [{"role": "user", "content": prompt}]},
-            timeout=90,
+            timeout=55,
         )
         data = r.json()
         if data.get("choices"):
@@ -430,7 +430,7 @@ def call_deepseek(prompt: str) -> dict:
                      "content-type": "application/json"},
             json={"model": "deepseek-chat", "max_tokens": 2000,
                   "messages": [{"role": "user", "content": prompt}]},
-            timeout=90,
+            timeout=55,
         )
         data = r.json()
         if data.get("choices"):
@@ -639,7 +639,7 @@ def try_swap(state, buy_sym, buy_conf, needed, scores, executed, today, now_time
 # Execute decisions
 # ─────────────────────────────────────────────────────────────────
 
-def execute_decisions(state, ai_text, label, strategy):
+def execute_decisions(state, ai_text, label, strategy, session=""):
     executed = []
     today = get_today_et()
     now_time = get_now_et()
@@ -821,7 +821,7 @@ def run_trade_session(session: str, provider: str = "grok", strategy: str = "v5"
         if check_no_trade_day_v5(ai_text):
             state["noTradeDayDate"] = get_today_et()
 
-    executed = execute_decisions(state, ai_text, label, strategy)
+    executed = execute_decisions(state, ai_text, label, strategy, session)
     save_state(state, provider)
 
     log_entry = {

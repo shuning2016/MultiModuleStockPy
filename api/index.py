@@ -227,6 +227,22 @@ def api_cron(session_key):
     if not is_trading_day():
         return ok({"skipped": "not a trading day"})
 
+    # DST guard: cron schedules are fixed UTC times calibrated for EDT (UTC-4).
+    # During EST (UTC-5, Nov–Mar) the cron fires 1 hour early. Reject if the
+    # actual ET clock time is more than 45 minutes from the expected session time.
+    _all_sessions = {s["key"]: s for s in StrategyV5.SESSIONS}
+    _all_sessions.update({s["key"]: s for s in StrategyV4.SESSIONS})
+    sess_cfg = _all_sessions.get(session_key)
+    if sess_cfg:
+        now_et = get_now_et()  # "HH:MM" in true local ET (handles DST via zoneinfo)
+        h_now, m_now = map(int, now_et.split(":"))
+        actual_mins = h_now * 60 + m_now
+        expected_mins = sess_cfg["hour"] * 60 + sess_cfg["min"]
+        if abs(actual_mins - expected_mins) > 45:
+            return ok({
+                "skipped": f"DST offset: expected ~{sess_cfg['time']} ET, got {now_et} ET"
+            })
+
     provider = request.args.get("provider", "grok")
     results = {}
 
